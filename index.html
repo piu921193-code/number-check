@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Number Check</title>
+</head>
+<body>
+  <h1>Number Check</h1>
+
+  <input id="number" placeholder="Mobile number">
+  <button onclick="searchNumber()">Search</button>
+
+  <p id="result"></p>
+
+  <script>
+    function searchNumber() {
+      let number = document.getElementById("number").value;
+
+      if (number === "9876543210") {
+        document.getElementById("result").innerHTML =
+          "Name: Test User<br>City: Budaun<br>PIN: 243601";
+      } else {
+        document.getElementById("result").innerHTML =
+          "No information found.";
+      }
+    }
+  </script>
+</body>
+</html>
