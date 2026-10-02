@@ -5,25 +5,69 @@
   <title>Number Check</title>
 </head>
 <body>
-  <h1>Number Check</h1>
 
-  <input id="number" placeholder="Mobile number">
-  <button onclick="searchNumber()">Search</button>
+<h1>📱 Number Check</h1>
 
-  <p id="result"></p>
+<h2>🔍 Search Public Profile</h2>
 
-  <script>
-    function searchNumber() {
-      let number = document.getElementById("number").value;
+<input id="searchNumber" type="tel" placeholder="Mobile number">
+<button onclick="searchProfile()">Search</button>
 
-      if (number === "9876543210") {
-        document.getElementById("result").innerHTML =
-          "Name: Test User<br>City: Budaun<br>PIN: 243601";
-      } else {
-        document.getElementById("result").innerHTML =
-          "No information found.";
-      }
-    }
-  </script>
+<p id="result"></p>
+
+<hr>
+
+<h2>📝 Register Your Number</h2>
+
+<input id="regNumber" type="tel" placeholder="Your mobile number">
+<br><br>
+
+<input id="regName" type="text" placeholder="Your name">
+<br><br>
+
+<input id="regCity" type="text" placeholder="Your city">
+<br><br>
+
+<button onclick="registerProfile()">Register</button>
+
+<p id="message"></p>
+
+<script>
+let profiles = {};
+
+function registerProfile() {
+  let number = document.getElementById("regNumber").value.trim();
+  let name = document.getElementById("regName").value.trim();
+  let city = document.getElementById("regCity").value.trim();
+
+  if (!number || !name || !city) {
+    document.getElementById("message").innerText =
+      "Please fill all fields.";
+    return;
+  }
+
+  profiles[number] = {
+    name: name,
+    city: city
+  };
+
+  document.getElementById("message").innerText =
+    "Your profile has been registered.";
+}
+
+function searchProfile() {
+  let number = document.getElementById("searchNumber").value.trim();
+
+  if (profiles[number]) {
+    document.getElementById("result").innerHTML =
+      "<b>Name:</b> " + profiles[number].name +
+      "<br><b>City:</b> " + profiles[number].city;
+  } else {
+    document.getElementById("result").innerText =
+      "No public profile found.";
+  }
+}
+</script>
+
 </body>
 </html>
