@@ -25,15 +25,19 @@
       border: 0;
       border-radius: 8px;
       font-size: 17px;
+      cursor: pointer;
     }
-    a { display: block; margin-top: 20px; }
+    a {
+      display: block;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="box">
-    <h2>📍 Akash Location Share</h2>
-    <p>अपनी लोकेशन शेयर करने के लिए नीचे बटन दबाएँ।
-    आपका फोन अनुमति माँगेगा।</p>
+    <h2>Akash Location Share</h2>
+    <p>अपनी लोकेशन शेयर करने के लिए नीचे बटन दबाएँ।</p>
+    <p>आपकी अनुमति के बिना लोकेशन प्राप्त नहीं होगी।</p>
     <button id="share">मेरी लोकेशन शेयर करें</button>
     <p id="result"></p>
   </div>
@@ -48,46 +52,50 @@
         return;
       }
 
-      result.textContent = "लोकेशन प्राप्त की जा रही है…";
+      result.textContent = "लोकेशन प्राप्त की जा रही है...";
 
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
-          const mapUrl =
-            `https://www.google.com/maps?q=${lat},${lon}`;
+          const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
 
-          result.textContent = "आपकी लोकेशन मिल गई। इसे केवल अपनी मर्जी से शेयर करें।";
+          result.textContent = "लोकेशन मिल गई। इसे अपनी मर्जी से शेयर करें।";
 
           const link = document.createElement("a");
           link.href = mapUrl;
           link.target = "_blank";
           link.rel = "noopener noreferrer";
           link.textContent = "Google Maps पर लोकेशन देखें";
+          result.appendChild(link);
 
-          const share = document.createElement("button");
-          share.textContent = "लोकेशन लिंक शेयर करें";
-          share.onclick = async () => {
-            if (navigator.share) {
-              try {
+          const shareButton = document.createElement("button");
+          shareButton.textContent = "लोकेशन लिंक शेयर करें";
+          shareButton.style.marginTop = "15px";
+
+          shareButton.onclick = async () => {
+            try {
+              if (navigator.share) {
                 await navigator.share({
                   title: "मेरी लोकेशन",
                   url: mapUrl
                 });
-              } catch (e) {}
-            } else {
-              result.append(" लिंक कॉपी करने के लिए इस लिंक को दबाकर रखें।");
+              } else if (navigator.clipboard) {
+                await navigator.clipboard.writeText(mapUrl);
+                result.append(" लिंक कॉपी हो गया।");
+              } else {
+                result.append(" ऊपर दिए गए Google Maps लिंक को खोलें।");
+              }
+            } catch (error) {
+              result.append(" शेयर नहीं हो पाया। दोबारा कोशिश करें।");
             }
           };
 
-          result.appendChild(link);
-          result.appendChild(share);
+          result.appendChild(shareButton);
         },
         () => {
-          result.textContent =
-            "लोकेशन नहीं मिली। अनुमति और फोन की Location सेटिंग जाँचें।";
-        },
-        { enableHighAccuracy: true, timeout: 15000 }
+          result.textContent = "लोकेशन नहीं मिली। फोन की Location चालू करें और अनुमति दें।";
+        }
       );
     };
   </script>
