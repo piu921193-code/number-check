@@ -1,16 +1,42 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Akash Location Share</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 25px;
+      background: #f2f5ff;
+    }
+    .box {
+      background: white;
+      padding: 22px;
+      border-radius: 14px;
+      max-width: 420px;
+      margin: 30px auto;
+    }
+    button {
+      padding: 14px 20px;
+      background: #1769ff;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      font-size: 17px;
+    }
+    a { display: block; margin-top: 20px; }
+  </style>
 </head>
 <body>
-  <h2>लोकेशन साझा करें</h2>
-  <p>यह बटन दबाने पर आपकी लोकेशन प्राप्त होगी और उसे आपके चुने हुए व्यक्ति के साथ साझा किया जाएगा। आगे बढ़ने से पहले उसकी जानकारी पढ़ें और अपनी मर्जी से सहमति दें।</p>
-  <button id="share">मेरी लोकेशन प्राप्त करें</button>
-  <p id="result"></p>
+  <div class="box">
+    <h2>📍 Akash Location Share</h2>
+    <p>अपनी लोकेशन शेयर करने के लिए नीचे बटन दबाएँ।
+    आपका फोन अनुमति माँगेगा।</p>
+    <button id="share">मेरी लोकेशन शेयर करें</button>
+    <p id="result"></p>
+  </div>
 
   <script>
     const button = document.getElementById("share");
@@ -18,7 +44,7 @@
 
     button.onclick = () => {
       if (!navigator.geolocation) {
-        result.textContent = "आपका ब्राउज़र लोकेशन की सुविधा नहीं देता।";
+        result.textContent = "आपका ब्राउज़र लोकेशन सपोर्ट नहीं करता।";
         return;
       }
 
@@ -28,21 +54,40 @@
         (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
-          const map = `https://maps.google.com/?q=${lat},${lon}`;
+          const mapUrl =
+            `https://www.google.com/maps?q=${lat},${lon}`;
 
-          result.replaceChildren();
-          const message = document.createElement("p");
-          message.textContent = "आपकी लोकेशन मिली। इसे अपनी मर्जी से साझा करें:";
+          result.textContent = "आपकी लोकेशन मिल गई। इसे केवल अपनी मर्जी से शेयर करें।";
+
           const link = document.createElement("a");
-          link.href = map;
-          link.textContent = "Google Maps पर मेरी लोकेशन";
+          link.href = mapUrl;
           link.target = "_blank";
           link.rel = "noopener noreferrer";
-          result.append(message, link);
+          link.textContent = "Google Maps पर लोकेशन देखें";
+
+          const share = document.createElement("button");
+          share.textContent = "लोकेशन लिंक शेयर करें";
+          share.onclick = async () => {
+            if (navigator.share) {
+              try {
+                await navigator.share({
+                  title: "मेरी लोकेशन",
+                  url: mapUrl
+                });
+              } catch (e) {}
+            } else {
+              result.append(" लिंक कॉपी करने के लिए इस लिंक को दबाकर रखें।");
+            }
+          };
+
+          result.appendChild(link);
+          result.appendChild(share);
         },
         () => {
-          result.textContent = "लोकेशन नहीं मिली। अनुमति और फोन की लोकेशन सेटिंग जाँचें।";
-        }
+          result.textContent =
+            "लोकेशन नहीं मिली। अनुमति और फोन की Location सेटिंग जाँचें।";
+        },
+        { enableHighAccuracy: true, timeout: 15000 }
       );
     };
   </script>
