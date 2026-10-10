@@ -4,111 +4,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GPS Location Share</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 25px 15px;
-      background: #f2f5f9;
-    }
-    .card {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      max-width: 420px;
-      margin: 30px auto;
-    }
-    button {
-      background: #1769e0;
-      color: white;
-      border: 0;
-      padding: 14px 20px;
-      border-radius: 10px;
-      font-size: 17px;
-    }
-    #result {
-      margin-top: 20px;
-      overflow-wrap: anywhere;
-    }
-  </style>
+  <title>Akash Location Share</title>
 </head>
 <body>
-  <div class="card">
-    <h2>📍 GPS Location Share</h2>
-    <p>अपनी लोकेशन देखने के लिए नीचे बटन दबाएँ।
-    अनुमति देना आपकी मर्जी है।</p>
-
-    <button id="locate">अपनी लोकेशन दिखाएँ</button>
-    <div id="result" aria-live="polite"></div>
-  </div>
+  <h2>लोकेशन साझा करें</h2>
+  <p>यह बटन दबाने पर आपकी लोकेशन प्राप्त होगी और उसे आपके चुने हुए व्यक्ति के साथ साझा किया जाएगा। आगे बढ़ने से पहले उसकी जानकारी पढ़ें और अपनी मर्जी से सहमति दें।</p>
+  <button id="share">मेरी लोकेशन प्राप्त करें</button>
+  <p id="result"></p>
 
   <script>
-    const button = document.getElementById("locate");
+    const button = document.getElementById("share");
     const result = document.getElementById("result");
 
-    button.addEventListener("click", () => {
+    button.onclick = () => {
       if (!navigator.geolocation) {
-        result.textContent = "आपका ब्राउज़र GPS सुविधा नहीं देता।";
+        result.textContent = "आपका ब्राउज़र लोकेशन की सुविधा नहीं देता।";
         return;
       }
 
-      result.textContent = "लोकेशन की अनुमति का इंतजार है...";
+      result.textContent = "लोकेशन प्राप्त की जा रही है…";
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
+          const map = `https://maps.google.com/?q=${lat},${lon}`;
 
           result.replaceChildren();
-
-          const heading = document.createElement("p");
-          heading.textContent = "आपकी लोकेशन:";
-          result.appendChild(heading);
-
-          const coordinates = document.createElement("p");
-          coordinates.textContent =
-            "Latitude: " + lat + " | Longitude: " + lon;
-          result.appendChild(coordinates);
-
-          const map = document.createElement("a");
-          map.href = "https://www.google.com/maps?q=" +
-            encodeURIComponent(lat + "," + lon);
-          map.textContent = "Google Maps पर देखें";
-          map.target = "_blank";
-          map.rel = "noopener noreferrer";
-          result.appendChild(map);
-
-          const copy = document.createElement("button");
-          copy.textContent = "लोकेशन कॉपी करें";
-          copy.style.display = "block";
-          copy.style.margin = "16px auto 0";
-          copy.addEventListener("click", async () => {
-            try {
-              await navigator.clipboard.writeText(lat + "," + lon);
-              copy.textContent = "कॉपी हो गया";
-            } catch {
-              result.append(" कॉपी नहीं हुआ; निर्देशांक हाथ से कॉपी करें।");
-            }
-          });
-          result.appendChild(copy);
+          const message = document.createElement("p");
+          message.textContent = "आपकी लोकेशन मिली। इसे अपनी मर्जी से साझा करें:";
+          const link = document.createElement("a");
+          link.href = map;
+          link.textContent = "Google Maps पर मेरी लोकेशन";
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          result.append(message, link);
         },
-        (error) => {
-          const messages = {
-            1: "आपने लोकेशन की अनुमति नहीं दी।",
-            2: "अभी लोकेशन उपलब्ध नहीं है।",
-            3: "समय समाप्त हुआ। दोबारा कोशिश करें।"
-          };
-          result.textContent =
-            messages[error.code] || "लोकेशन नहीं मिल सकी।";
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 20000,
-          maximumAge: 0
+        () => {
+          result.textContent = "लोकेशन नहीं मिली। अनुमति और फोन की लोकेशन सेटिंग जाँचें।";
         }
       );
-    });
+    };
   </script>
 </body>
 </html>
